@@ -1,15 +1,18 @@
 import discord
-import os
+from discord.ext import commands
 
-client = discord.Client()
+bot = commands.Bot(command_prefix='>')
 
-@client.event
+
+
+
+@bot.event
 async def on_ready():
-    print('We have logged in as {0.user}'.format(client))
+    print("Я запущен!")
 
-@client.event
+@bot.event
 async def on_message(message):
-    if message.author == client.user:
+    if message.author == bot.user:
         return
 
     if message.content.startswith('hello') :
@@ -27,5 +30,8 @@ async def on_message(message):
             await message.channel.send('Привет Данила, я тебя тоже знаю!')
 
 
+@bot.command()
+async def Hi(ctx):
+    await ctx.send('Hi')
 
-client.run('OTAwNzQ5NjcwNTU1NDc2MDI5.YXF2gA.k3pV3zxzBFckbHi5uk5pZVhhKm4')
+bot.run('OTAwNzQ5NjcwNTU1NDc2MDI5.YXF2gA.fQLP8iGemgQGI4jVAdjKIE5JM7o')
