@@ -1,37 +1,74 @@
+import os
 import discord
 from discord.ext import commands
+import random
+from dotenv import load_dotenv
 
-bot = commands.Bot(command_prefix='>')
+load_dotenv()
+TOKEN = os.getenv('DISCORD_TOKEN')
 
+description = '''An example bot to showcase the discord.ext.commands extension
+module.
+There are a number of utility commands being showcased here.'''
 
+intents = discord.Intents.default()
+intents.members = True
 
+bot = commands.Bot(command_prefix='-', description=description, intents=intents)
 
 @bot.event
 async def on_ready():
-    print("Я запущен!")
-
-@bot.event
-async def on_message(message):
-    if message.author == bot.user:
-        return
-
-    if message.content.startswith('hello') :
-        if message.author.id == 699253212011692073:
-            await message.channel.send('АААА ЭТО ЖЕ МАААРК!')
-        if message.author.id == 560791485071491082:
-            await message.channel.send('Привет Гера, скоро я выучу новые слова от тебя и мы поговорим)')
-        if message.author.id == 874657062917910580:
-            await message.channel.send('РОМАААН! Привет! Я работаю Все огонь работаем дальше!)')
-        if message.author.id == 495645748944175114:
-            await message.channel.send('Создааааатель!!!!')
-        if message.author.id == 573581266096488459:
-            await message.channel.send('Привет Никита, я тебя знаю!')
-        if message.author.id == 541541648153444354:
-            await message.channel.send('Привет Данила, я тебя тоже знаю!')
-
+    print('Logged in as')
+    print(bot.user.name)
+    print(bot.user.id)
+    print('------')
 
 @bot.command()
-async def Hi(ctx):
-    await ctx.send('Hi')
+async def add(ctx, left: int, right: int):
+    """Adds two numbers together."""
+    await ctx.send(left + right)
 
-bot.run('OTAwNzQ5NjcwNTU1NDc2MDI5.YXF2gA.fQLP8iGemgQGI4jVAdjKIE5JM7o')
+@bot.command()
+async def roll(ctx, dice: str):
+    """Rolls a dice in NdN format."""
+    try:
+        rolls, limit = map(int, dice.split('d'))
+    except Exception:
+        await ctx.send('Format has to be in NdN!')
+        return
+
+    result = ', '.join(str(random.randint(1, limit)) for r in range(rolls))
+    await ctx.send(result)
+
+@bot.command(description='For when you wanna settle the score some other way')
+async def choose(ctx, *choices: str):
+    """Chooses between multiple choices."""
+    await ctx.send(random.choice(choices))
+
+@bot.command()
+async def repeat(ctx, times: int, content='repeating...'):
+    """Repeats a message multiple times."""
+    for i in range(times):
+        await ctx.send(content)
+
+@bot.command()
+async def joined(ctx, member: discord.Member):
+    """Says when a member joined."""
+    await ctx.send('{0.name} joined in {0.joined_at}'.format(member))
+
+@bot.group()
+async def cool(ctx):
+    """Says if a user is cool.
+    In reality this just checks if a subcommand is being invoked.
+    """
+    if ctx.invoked_subcommand is None:
+        await ctx.send('No, {0.subcommand_passed} is not cool'.format(ctx))
+
+@cool.command(name='bot')
+async def _bot(ctx):
+    """Is the bot cool?"""
+    await ctx.send('Yes, the bot is cool.')
+
+
+
+bot.run(TOKEN)
