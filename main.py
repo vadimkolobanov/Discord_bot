@@ -3,13 +3,12 @@ import discord
 from discord.ext import commands
 import random
 from dotenv import load_dotenv
-
+import socket
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
-description = '''An example bot to showcase the discord.ext.commands extension
-module.
-There are a number of utility commands being showcased here.'''
+description = 'Hello from Something'
+
 
 intents = discord.Intents.default()
 intents.members = True
@@ -23,10 +22,30 @@ async def on_ready():
     print(bot.user.id)
     print('------')
 
+
+
 @bot.command()
-async def add(ctx, left: int, right: int):
-    """Adds two numbers together."""
-    await ctx.send(left + right)
+async def status (ctx):
+    async def check_status(self, status, hex, h_name):
+        embedVar = discord.Embed(title=f"Статус сервера: {status} ", description="", color=hex)
+
+
+        await self.send(embed=embedVar)
+    try:
+
+
+
+        h_name = socket.gethostbyname('minecraftshare.ru')
+        if h_name:
+           await check_status(ctx,'Online',0x00ff00,h_name)
+
+
+    except Exception:
+        await check_status(ctx,'Offline',0xF44336,'Не определен')
+
+
+
+
 
 @bot.command()
 async def roll(ctx, dice: str):
@@ -56,18 +75,7 @@ async def joined(ctx, member: discord.Member):
     """Says when a member joined."""
     await ctx.send('{0.name} joined in {0.joined_at}'.format(member))
 
-@bot.group()
-async def cool(ctx):
-    """Says if a user is cool.
-    In reality this just checks if a subcommand is being invoked.
-    """
-    if ctx.invoked_subcommand is None:
-        await ctx.send('No, {0.subcommand_passed} is not cool'.format(ctx))
 
-@cool.command(name='bot')
-async def _bot(ctx):
-    """Is the bot cool?"""
-    await ctx.send('Yes, the bot is cool.')
 
 
 
