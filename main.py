@@ -4,6 +4,9 @@ from discord.ext import commands
 import random
 from dotenv import load_dotenv
 import socket
+
+from pythonping import ping
+
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
 
@@ -36,7 +39,8 @@ async def status (ctx):
 
 
         h_name = socket.gethostbyname('minecraftshare.ru')
-        if h_name:
+        print(ping(h_name))
+        if ping(h_name):
            await check_status(ctx,'Online',0x00ff00,h_name)
 
 
